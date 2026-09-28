@@ -109,3 +109,12 @@ Worker が動いたら、`system.ss` のGASのトリガー画面（時計のア�
 ログは Cloudflare の管理画面 → Worker → **Logs** で見られる。
 
 
+
+## 手元でのテスト
+
+```
+node test/worker.test.mjs
+```
+
+疑似の Gmail / GitHub で「起動 → 実行中は待つ → 成功で★ → 失敗なら起動し直す」を確かめる。
+`test/sample-notice.eml` は本物と同じ文字コード（ISO-2022-JP）で作った見本の反響通知。
