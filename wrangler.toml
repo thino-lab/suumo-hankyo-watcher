@@ -1,0 +1,7 @@
+# コマンドで登録（デプロイ）する場合の設定。画面から貼り付けて登録する場合は使わない。
+name = "suumo-hankyo-watcher"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+
+[triggers]
+crons = ["*/5 * * * *"]   # 5分おき
