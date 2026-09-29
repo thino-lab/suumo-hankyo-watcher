@@ -85,7 +85,9 @@ function hintFor(msg) {
   return 'Cloudflare の Worker → Logs でも詳細を見られます';
 }
 
-async function run(env, { dryRun }) {
+async function run(rawEnv, { dryRun }) {
+  // コピー時に混ざりやすい前後の空白・改行を取り除く
+  const env = Object.fromEntries(Object.entries(rawEnv).map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v]));
   const log = [];
   const say = (s) => { console.log(s); log.push(s); };
 
