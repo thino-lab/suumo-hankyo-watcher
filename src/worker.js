@@ -43,7 +43,7 @@ const GIVEUP_MIN = 60;                          // 起動からこの分数た�
 export default {
   // Cron Trigger（5分おき）から呼ばれる本体
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(run(env, { dryRun: false }));
+    ctx.waitUntil(run(env, { dryRun: false }).catch(e => console.error(`止まりました: ${e.message}`)));
   },
 
   // 動作確認用。https://<worker>.workers.dev/check?key=<TEST_KEY>
@@ -55,13 +55,35 @@ export default {
     if (!env.TEST_KEY || url.searchParams.get('key') !== env.TEST_KEY) {
       return new Response('forbidden', { status: 403 });
     }
-    const result = await run(env, { dryRun: url.searchParams.get('run') !== '1' });
+    let result, status = 200;
+    try {
+      result = await run(env, { dryRun: url.searchParams.get('run') !== '1' });
+    } catch (e) {
+      // どこで止まったかを画面に出す。鍵の中身は含めない
+      status = 500;
+      result = { error: e.message, hint: hintFor(e.message), secrets: secretStatus(env) };
+    }
     return new Response(JSON.stringify(result, null, 2), {
+      status,
       headers: { 'content-type': 'application/json; charset=utf-8' },
     });
   },
 };
 
+
+/** Secret が登録されているかだけを返す（値は出さない） */
+function secretStatus(env) {
+  const names = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_REFRESH_TOKEN', 'GITHUB_TOKEN', 'TEST_KEY'];
+  return Object.fromEntries(names.map(n => [n, env[n] ? `登録あり（${String(env[n]).length}文字）` : '未登録']));
+}
+
+function hintFor(msg) {
+  if (/invalid_grant/.test(msg)) return 'Refresh token が使えません。貼り間違い、または別のクライアントIDで発行した鍵の可能性。OAuth Playground で発行し直してください';
+  if (/invalid_client|unauthorized_client/.test(msg)) return 'クライアントID かクライアントシークレットが違います。Google Cloud の認証情報と見比べてください';
+  if (/Gmail API エラー 403/.test(msg)) return 'Gmail API が有効になっていないか、許可の範囲が gmail.modify になっていません';
+  if (/Gmail API エラー 401/.test(msg)) return 'Googleの鍵が無効です。発行し直してください';
+  return 'Cloudflare の Worker → Logs でも詳細を見られます';
+}
 
 async function run(env, { dryRun }) {
   const log = [];
