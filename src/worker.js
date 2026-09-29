@@ -236,7 +236,7 @@ async function gmailClient(env) {
     headers: { Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json' },
   }).then(async r => {
     if (!r.ok) throw new Error(`Gmail API エラー ${r.status} (${path}): ${await r.text()}`);
-    return r.json();
+    return r.text().then(t => (t ? JSON.parse(t) : {}));   // batchModify は空の返事を返す
   });
 
   return {
