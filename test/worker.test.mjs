@@ -30,7 +30,7 @@ globalThis.fetch = async (url, init={}) => {
       });
       return ok({ messages: ids.map(id => ({ id })) });
     }
-    if (p === 'messages/batchModify') { calls.push(['modify', body]); body.ids.forEach(id => { body.addLabelIds.forEach(l => msgs[id].labels.add(l)); body.removeLabelIds.forEach(l => msgs[id].labels.delete(l)); }); return new Response('', { status: 204 }); }   // 本物の batchModify は空の返事
+    if (p === 'messages/batchModify') { calls.push(['modify', body]); body.ids.forEach(id => { body.addLabelIds.forEach(l => msgs[id].labels.add(l)); body.removeLabelIds.forEach(l => msgs[id].labels.delete(l)); }); return new Response('', { status: 200 }); }   // 本物の batchModify は空の返事
     const id = p.split('/')[1]; return ok({ raw: b64(msgs[id].raw), snippet: '', internalDate: String(msgs[id].date) });
   }
   if (u.host === 'api.github.com') {
