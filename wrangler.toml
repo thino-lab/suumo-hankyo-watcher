@@ -1,7 +1,11 @@
-# コマンドで登録（デプロイ）する場合の設定。画面から貼り付けて登録する場合は使わない。
+# Cloudflare の Workers Builds（GitHub連携）が、main への push ごとにこの設定でデプロイする。
+# Worker のコードは GitHub で直す（Cloudflare の画面で直しても次の push で上書きされる）。
 name = "suumo-hankyo-watcher"
 main = "src/worker.js"
 compatibility_date = "2026-09-01"
 
 [triggers]
 crons = ["*/5 * * * *"]   # 5分おき
+
+[observability]
+enabled = true   # Workers Logs（ログ）を残す
