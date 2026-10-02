@@ -118,3 +118,12 @@ node test/worker.test.mjs
 
 疑似の Gmail / GitHub で「起動 → 実行中は待つ → 成功で★ → 失敗なら起動し直す」を確かめる。
 `test/sample-notice.eml` は本物と同じ文字コード（ISO-2022-JP）で作った見本の反響通知。
+
+
+## デプロイ（自動）
+
+Cloudflare の Workers Builds で GitHub と連携済み。`main` に push すると、`wrangler.toml` の設定で自動デプロイされる（1〜2分）。
+
+- コードは GitHub で直す。Cloudflare の画面（Edit code）で直しても、次の push で上書きされる。
+- Secrets（Google / GitHub の鍵、TEST_KEY）は Cloudflare 側に残るので、デプロイで消えない。
+- 反映されたかは Cloudflare の Worker → Deployments で、どのコミットが Active か確認できる。
