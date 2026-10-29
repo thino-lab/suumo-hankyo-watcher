@@ -2,7 +2,7 @@
  * SUUMOの反響通知メールを見張り、届いていたら GitHub Actions を起動する（Cloudflare Worker）。
  *
  * 【流れ】
- * 1. 5分おき（Cron Trigger）に system.ss@pure-growth.net の Gmail を探す
+ * 1. 1時間おき（Cron Trigger）に system.ss@pure-growth.net の Gmail を探す
  * 2. 反響通知（SUUMOから届き、本文にダウンロードリンクがあるもの）を見つけたら、
  *    本文の「貴社コード」でブランドを判定し、そのリポジトリを起動する
  *    → メールに「SUUMO起動中」ラベルを付ける（同じメールで二度起動しない）
@@ -33,12 +33,14 @@
 const COMPANIES = {
   '501482': 'thino-lab/yamaka_only-home', // 株式会社ヤマカ木材（オンリーホーム）
   '130967': 'thino-lab/yamaka_naturie',   // 株式会社ヤマカ木材（ナチュリエ）
+  '063958': 'thino-lab/suumo-hankyo-thirty-four', // 株式会社サーティーフォー
 };
 
 // 反響通知の差出人。
 //   hankyo@housingnavi.jp           … SUUMO本体（ナチュリエなど。自動転送されたものもこのまま届く）
 //   onlyhome_honey@googlegroups.com … オンリーホーム。Googleグループ経由なので差出人がグループになる
-const ALLOWED_FROM = ['hankyo@housingnavi.jp', 'onlyhome_honey@googlegroups.com'];
+// hankyou.34@thirty-four.co.jp … サーティーフォー。反響ML経由なので差出人がMLになる
+const ALLOWED_FROM = ['hankyo@housingnavi.jp', 'onlyhome_honey@googlegroups.com', 'hankyou.34@thirty-four.co.jp'];
 
 const MARKER = '/house/hj/operation/download'; // 本文にこのリンクがあるものだけ対象
 const LABEL_DONE = 'SUUMO取込済';   // ダウンロードまで済んだ目印（★と一緒に付ける）
@@ -50,7 +52,7 @@ const MEMO_FROM = 'system.ss@pure-growth.net'; // 取込済メモの差出人表
 // --------------------------------------------------------------------
 
 export default {
-  // Cron Trigger（5分おき）から呼ばれる本体
+  // Cron Trigger（1時間おき）から呼ばれる本体
   async scheduled(event, env, ctx) {
     ctx.waitUntil(run(env, { dryRun: false }).catch(e => console.error(`止まりました: ${e.message}`)));
   },
@@ -186,7 +188,7 @@ async function confirmPending(env, gmail, labels, say) {
 
 /** 取込済メモの本文 */
 function buildMemo({ code, repo, inquiredAt, runUrl, m }) {
-  const brand = { 'thino-lab/yamaka_only-home': 'オンリーホーム', 'thino-lab/yamaka_naturie': 'ナチュリエ' }[repo] || repo;
+  const brand = { 'thino-lab/yamaka_only-home': 'オンリーホーム', 'thino-lab/yamaka_naturie': 'ナチュリエ', 'thino-lab/suumo-hankyo-thirty-four': 'サーティーフォー' }[repo] || repo;
   return [
     '【SUUMO 取込済メモ】',
     '',
