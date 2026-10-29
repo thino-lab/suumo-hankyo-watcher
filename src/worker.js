@@ -34,6 +34,7 @@ const COMPANIES = {
   '501482': 'thino-lab/yamaka_only-home', // 株式会社ヤマカ木材（オンリーホーム）
   '130967': 'thino-lab/yamaka_naturie',   // 株式会社ヤマカ木材（ナチュリエ）
   '063958': 'thino-lab/suumo-hankyo-thirty-four', // 株式会社サーティーフォー
+  '134241': 'thino-lab/suumo-hankyo-kadel', // KADeL
 };
 
 // 反響通知の差出人。
@@ -188,7 +189,7 @@ async function confirmPending(env, gmail, labels, say) {
 
 /** 取込済メモの本文 */
 function buildMemo({ code, repo, inquiredAt, runUrl, m }) {
-  const brand = { 'thino-lab/yamaka_only-home': 'オンリーホーム', 'thino-lab/yamaka_naturie': 'ナチュリエ', 'thino-lab/suumo-hankyo-thirty-four': 'サーティーフォー' }[repo] || repo;
+  const brand = { 'thino-lab/yamaka_only-home': 'オンリーホーム', 'thino-lab/yamaka_naturie': 'ナチュリエ', 'thino-lab/suumo-hankyo-thirty-four': 'サーティーフォー', 'thino-lab/suumo-hankyo-kadel': 'KADeL' }[repo] || repo;
   return [
     '【SUUMO 取込済メモ】',
     '',
