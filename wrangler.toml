@@ -5,7 +5,7 @@ main = "src/worker.js"
 compatibility_date = "2026-09-01"
 
 [triggers]
-crons = ["*/5 * * * *"]   # 5分おき
+crons = ["0 * * * *"]   # 1時間おき（毎時0分）
 
 [observability]
 enabled = true   # Workers Logs（ログ）を残す
